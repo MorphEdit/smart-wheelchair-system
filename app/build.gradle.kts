@@ -78,4 +78,7 @@ dependencies {
 
     // Add Cloud Messaging (FCM) สำหรับการแจ้งเตือน
     implementation("com.google.firebase:firebase-messaging")
+
+    // เพิ่ม SwipeRefreshLayout dependency
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

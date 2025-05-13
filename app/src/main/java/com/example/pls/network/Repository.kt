@@ -215,4 +215,58 @@ class Repository {
             }
         }
     }
+
+    // ดึงข้อมูลการแจ้งเตือนทั้งหมด
+    suspend fun getNotifications(token: String): Result<List<NotificationItem>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authToken = "Bearer $token"
+                val response = apiService.getNotifications(authToken)
+
+                if (response.isSuccessful && response.body()?.success == true) {
+                    Result.success(response.body()?.notifications ?: emptyList())
+                } else {
+                    Result.failure(Exception("ไม่สามารถดึงข้อมูลการแจ้งเตือนได้: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    // อ่านการแจ้งเตือน (ทำเครื่องหมายว่าอ่านแล้ว)
+    suspend fun markNotificationAsRead(token: String, notificationId: String): Result<Boolean> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authToken = "Bearer $token"
+                val response = apiService.markNotificationAsRead(authToken, notificationId)
+
+                if (response.isSuccessful) {
+                    Result.success(true)
+                } else {
+                    Result.failure(Exception("ไม่สามารถทำเครื่องหมายว่าอ่านแล้ว: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    // ลบการแจ้งเตือน
+    suspend fun deleteNotification(token: String, notificationId: String): Result<Boolean> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authToken = "Bearer $token"
+                val response = apiService.deleteNotification(authToken, notificationId)
+
+                if (response.isSuccessful) {
+                    Result.success(true)
+                } else {
+                    Result.failure(Exception("ไม่สามารถลบการแจ้งเตือน: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 }

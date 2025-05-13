@@ -1,52 +1,114 @@
 package com.example.pls.ui.notifications
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.pls.model.NotificationItem
+import com.example.pls.network.Repository
+import com.example.pls.utils.UserSessionManager
+import kotlinx.coroutines.launch
 
-// ข้อมูลรายการแจ้งเตือน
-data class NotificationItem(
-    val title: String,
-    val content: String,
-    val date: String
-)
+class NotificationsViewModel(application: Application) : AndroidViewModel(application) {
 
-class NotificationsViewModel : ViewModel() {
+    private val repository = Repository()
+    private val userSessionManager = UserSessionManager(application)
+    private val TAG = "NotificationsViewModel"
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is notifications Fragment"
-    }
-    val text: LiveData<String> = _text
-
-    // รายการแจ้งเตือน
-    private val _notifications = MutableLiveData<List<NotificationItem>>().apply {
-        value = generateDummyNotifications()
-    }
+    private val _notifications = MutableLiveData<List<NotificationItem>>()
     val notifications: LiveData<List<NotificationItem>> = _notifications
 
-    // สร้างข้อมูลตัวอย่าง
-    private fun generateDummyNotifications(): List<NotificationItem> {
-        return listOf(
-            NotificationItem(
-                "การชำระเงินสำเร็จ",
-                "การชำระเงินของคุณสำหรับรายการ #12345 เสร็จสมบูรณ์แล้ว",
-                "10 นาทีที่แล้ว"
-            ),
-            NotificationItem(
-                "ส่วนลดพิเศษ",
-                "รับส่วนลด 20% สำหรับการสั่งซื้อครั้งต่อไปของคุณ ใช้โค้ด SPECIAL20",
-                "2 ชั่วโมงที่แล้ว"
-            ),
-            NotificationItem(
-                "คำสั่งซื้อกำลังจัดส่ง",
-                "คำสั่งซื้อ #67890 ของคุณกำลังอยู่ระหว่างการจัดส่ง คาดว่าจะถึงภายในวันพรุ่งนี้",
-                "1 วันที่แล้ว"
-            ),
-            NotificationItem(
-                "แจ้งเตือนระบบ",
-                "ระบบได้ทำการอัปเดตเป็นเวอร์ชั่นล่าสุดเรียบร้อยแล้ว",
-                "3 วันที่แล้ว"
-            )
-        )
+    private val _isLoading = MutableLiveData<Boolean>(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> = _error
+
+    // เริ่มดึงข้อมูลเมื่อเปิดหน้า
+    init {
+        loadNotifications()
+    }
+
+    // ดึงข้อมูลการแจ้งเตือนจากเซิร์ฟเวอร์
+    fun loadNotifications() {
+        val token = userSessionManager.getToken() ?: return
+
+        _isLoading.value = true
+        _error.value = null
+
+        viewModelScope.launch {
+            try {
+                val result = repository.getNotifications(token)
+                result.onSuccess { notificationsList ->
+                    _notifications.value = notificationsList
+                }.onFailure { exception ->
+                    _error.value = exception.message ?: "ไม่สามารถโหลดการแจ้งเตือนได้"
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "เกิดข้อผิดพลาดในการโหลดการแจ้งเตือน"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    // ทำเครื่องหมายว่าการแจ้งเตือนได้อ่านแล้ว
+    fun markAsRead(notificationId: String) {
+        val token = userSessionManager.getToken() ?: return
+
+        viewModelScope.launch {
+            try {
+                val result = repository.markNotificationAsRead(token, notificationId)
+                result.onSuccess {
+                    // อัปเดตรายการการแจ้งเตือนในแอป
+                    val currentList = _notifications.value?.toMutableList() ?: mutableListOf()
+                    val index = currentList.indexOfFirst { it.id == notificationId }
+
+                    if (index != -1) {
+                        // สร้างอ็อบเจกต์ใหม่ที่ทำเครื่องหมายว่าอ่านแล้ว
+                        val updatedItem = currentList[index].copy(isRead = true)
+                        currentList[index] = updatedItem
+                        _notifications.value = currentList
+                    }
+                }.onFailure { exception ->
+                    _error.value = exception.message ?: "ไม่สามารถทำเครื่องหมายว่าอ่านแล้ว"
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "เกิดข้อผิดพลาด"
+            }
+        }
+    }
+
+    // ลบการแจ้งเตือน
+    fun deleteNotification(notificationId: String) {
+        val token = userSessionManager.getToken() ?: return
+
+        viewModelScope.launch {
+            try {
+                val result = repository.deleteNotification(token, notificationId)
+                result.onSuccess {
+                    // ลบออกจากรายการแจ้งเตือนในแอป
+                    val currentList = _notifications.value?.toMutableList() ?: mutableListOf()
+                    val filteredList = currentList.filter { it.id != notificationId }
+                    _notifications.value = filteredList
+                }.onFailure { exception ->
+                    _error.value = exception.message ?: "ไม่สามารถลบการแจ้งเตือน"
+                }
+            } catch (e: Exception) {
+                _error.value = e.message ?: "เกิดข้อผิดพลาด"
+            }
+        }
+    }
+
+    // ล้างการแจ้งเตือนทั้งหมด (อัปเดตเฉพาะ UI)
+    fun clearAllNotifications() {
+        _notifications.value = emptyList()
+        // หมายเหตุ: ในระบบจริงควรมีการเรียก API ไปยังเซิร์ฟเวอร์เพื่อทำเครื่องหมายหรือลบการแจ้งเตือนทั้งหมด
+    }
+
+    // ล้างข้อความแจ้งข้อผิดพลาด
+    fun clearError() {
+        _error.value = null
     }
 }

@@ -56,4 +56,22 @@ interface ApiService {
     // ลงทะเบียน FCM token
     @POST("register-device-token")
     suspend fun registerDeviceToken(@Body request: RegisterTokenRequest): Response<RegisterTokenResponse>
+
+    // เพิ่ม API ดึงข้อมูลการแจ้งเตือน
+    @GET("notifications")
+    suspend fun getNotifications(@Header("Authorization") token: String): Response<NotificationsResponse>
+
+    // เพิ่ม API อ่านการแจ้งเตือน
+    @POST("notifications/{id}/read")
+    suspend fun markNotificationAsRead(
+        @Header("Authorization") token: String,
+        @Path("id") notificationId: String
+    ): Response<Map<String, Any>>
+
+    // เพิ่ม API ลบการแจ้งเตือน
+    @DELETE("notifications/{id}")
+    suspend fun deleteNotification(
+        @Header("Authorization") token: String,
+        @Path("id") notificationId: String
+    ): Response<Map<String, Any>>
 }

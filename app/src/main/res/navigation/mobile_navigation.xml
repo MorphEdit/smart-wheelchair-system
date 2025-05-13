@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <!-- หน้าหลัก -->
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.pls.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_navigation_home_to_pairingFragment"
+            app:destination="@id/pairingFragment" />
+    </fragment>
+
+    <!-- แดชบอร์ด -->
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.example.pls.ui.dashboard.DashboardFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_dashboard">
+        <action
+            android:id="@+id/action_navigation_dashboard_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_pairingFragment"
+            app:destination="@id/pairingFragment" />
+    </fragment>
+
+    <!-- แจ้งเตือน -->
+    <fragment
+        android:id="@+id/navigation_notifications"
+        android:name="com.example.pls.ui.notifications.NotificationsFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_notifications" />
+
+    <!-- หน้าบัญชีผู้ใช้ -->
+    <fragment
+        android:id="@+id/navigation_account"
+        android:name="com.example.pls.ui.account.AccountFragment"
+        android:label="บัญชีผู้ใช้"
+        tools:layout="@layout/fragment_account">
+        <action
+            android:id="@+id/action_navigation_account_to_navigation_settings"
+            app:destination="@id/navigation_settings" />
+        <action
+            android:id="@+id/action_navigation_account_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_navigation_account_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+    </fragment>
+
+    <!-- หน้าตั้งค่า -->
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.example.pls.ui.settings.SettingsFragment"
+        android:label="ตั้งค่า"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_navigation_settings_to_pairingFragment"
+            app:destination="@id/pairingFragment" />
+        <action
+            android:id="@+id/action_navigation_settings_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <!-- หน้าล็อกอิน -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.pls.ui.auth.LoginFragment"
+        android:label="เข้าสู่ระบบ"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- หน้าลงทะเบียน -->
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.pls.ui.auth.RegisterFragment"
+        android:label="ลงทะเบียน"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_registerFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- หน้าแก้ไขโปรไฟล์ -->
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="com.example.pls.ui.account.EditProfileFragment"
+        android:label="แก้ไขโปรไฟล์"
+        tools:layout="@layout/fragment_edit_profile">
+        <action
+            android:id="@+id/action_editProfileFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/navigation_home"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <!-- หน้าจับคู่รถวีลแชร์ -->
+    <fragment
+        android:id="@+id/pairingFragment"
+        android:name="com.example.pls.ui.pairing.PairingFragment"
+        android:label="@string/title_pairing"
+        tools:layout="@layout/fragment_pairing">
+        <action
+            android:id="@+id/action_pairingFragment_to_navigation_dashboard"
+            app:destination="@id/navigation_dashboard" />
+        <action
+            android:id="@+id/action_pairingFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+</navigation>

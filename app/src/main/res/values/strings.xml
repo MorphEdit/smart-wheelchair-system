@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">pls</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_account">บัญชี</string>
+    <string name="title_pairing">จับคู่รถวีลแชร์</string>
+    <string name="title_control">ควบคุมรถวีลแชร์</string>
+    <string name="pairing_description">กรุณาป้อนรหัสจับคู่ 6 หลักที่แสดงบนหน้าจอของรถวีลแชร์</string>
+    <string name="pair_button">จับคู่อุปกรณ์</string>
+    <string name="control_forward">เดินหน้า</string>
+    <string name="control_backward">ถอยหลัง</string>
+    <string name="control_left">เลี้ยวซ้าย</string>
+    <string name="control_right">เลี้ยวขวา</string>
+    <string name="control_stop">หยุด</string>
+    <string name="disconnect">ยกเลิกการเชื่อมต่อ</string>
+    <string name="wheelchair_status">สถานะ: %1$s</string>
+    <string name="default_notification_channel_id">wheelchair_channel</string>
+    <string name="default_notification_channel_name">การแจ้งเตือนจากรถวีลแชร์</string>
+</resources>
